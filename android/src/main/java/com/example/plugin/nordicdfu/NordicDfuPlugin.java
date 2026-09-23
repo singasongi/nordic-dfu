@@ -22,6 +22,8 @@ import no.nordicsemi.android.dfu.DfuServiceController;
 import no.nordicsemi.android.dfu.DfuServiceInitiator;
 import org.json.JSONException;
 import org.json.JSONObject;
+import android.net.Uri;
+
 
 @CapacitorPlugin(
     name = "NordicDfu",
@@ -45,7 +47,7 @@ public class NordicDfuPlugin extends Plugin {
         String deviceAddress = (String) data.opt("deviceAddress");
         String deviceName = (String) data.opt("deviceName");
         String filePath = (String) data.opt("filePath");
-
+        Uri fileUri = Uri.parse(filePath);
         if (deviceAddress == null || deviceAddress.isEmpty()) {
             call.reject("deviceAddress is required");
             return;
@@ -61,27 +63,27 @@ public class NordicDfuPlugin extends Plugin {
             return;
         }
 
-        if (filePath.startsWith("file://")) {
-            filePath = filePath.replace("file://", "");
-        }
-        File file = new File(filePath);
-        if (!file.exists()) {
-            call.reject("File not found: " + filePath);
-            return;
-        }
+        // if (filePath.startsWith("file://")) {
+        //     filePath = filePath.replace("file://", "");
+        // }
+        // File file = new File(filePath);
+        // if (!file.exists()) {
+        //     call.reject("File not found: " + filePath);
+        //     return;
+        // }
 
-        List<String> supportedFileTypes = Arrays.asList(".bin", ".hex", ".zip");
-        boolean isFileTypeSupported = false;
-        for (String type : supportedFileTypes) {
-            if (filePath.endsWith(type)) {
-                isFileTypeSupported = true;
-                break;
-            }
-        }
-        if (!isFileTypeSupported) {
-            call.reject("File type not supported");
-            return;
-        }
+        // List<String> supportedFileTypes = Arrays.asList(".bin", ".hex", ".zip");
+        // boolean isFileTypeSupported = false;
+        // for (String type : supportedFileTypes) {
+        //     if (filePath.endsWith(type)) {
+        //         isFileTypeSupported = true;
+        //         break;
+        //     }
+        // }
+        // if (!isFileTypeSupported) {
+        //     call.reject("File type not supported");
+        //     return;
+        // }
 
         final DfuServiceInitiator starter = new DfuServiceInitiator(deviceAddress);
 
@@ -187,11 +189,11 @@ public class NordicDfuPlugin extends Plugin {
             }
         }
 
-        if (filePath.endsWith(".bin") || filePath.endsWith(".hex")) {
-            starter.setBinOrHex(DfuBaseService.TYPE_APPLICATION, filePath).setInitFile(null, null);
-        } else {
-            starter.setZip(filePath);
-        }
+        // if (fileUri.endsWith(".bin") || fileUri.endsWith(".hex")) {
+        //     starter.setBinOrHex(DfuBaseService.TYPE_APPLICATION, fileUri).setInitFile(null, null);
+        // } else {
+            starter.setZip(fileUri);
+        // }
 
         final DfuServiceController controller = starter.start(getContext(), DfuService.class);
 
